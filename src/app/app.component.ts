@@ -7,7 +7,7 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   // Set our map properties
-  mapCenter = [-122.4194, 37.7749];
+  mapCenter = [104.1, 30.5];
   basemapType = 'satellite';
   mapZoomLevel = 16;
 
