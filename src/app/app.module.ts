@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import {EsriMapComponent, PizzaPartyComponent} from './esri-map/esri-map.component';
+import {EsriMapComponent} from './esri-map/esri-map.component';
 
 import {CommonModule} from '@angular/common';
 import {
