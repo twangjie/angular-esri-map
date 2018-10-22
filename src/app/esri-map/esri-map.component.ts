@@ -14,6 +14,7 @@
 import { Component, OnInit, ViewChild, ElementRef, Input, Output, EventEmitter } from '@angular/core';
 import { loadModules } from 'esri-loader';
 import esri = __esri;
+import {MatSnackBar} from '@angular/material';
 
 @Component({
   selector: 'app-esri-map',
@@ -33,6 +34,14 @@ export class EsriMapComponent implements OnInit {
   private _zoom: number = 10;
   private _center: Array<number> = [0.1278, 51.5074];
   private _basemap: string = 'streets';
+
+
+  constructor(public snackBar: MatSnackBar) {
+  }
+
+  ngOnInit() {
+    this.initializeMap();
+  }
 
   @Input()
   set zoom(zoom: number) {
@@ -61,13 +70,12 @@ export class EsriMapComponent implements OnInit {
     return this._basemap;
   }
 
-  constructor() { }
-
   async initializeMap() {
     try {
-      const [EsriMap, EsriMapView] = await loadModules([
+      const [EsriMap, EsriMapView, webMercatorUtils] = await loadModules([
         'esri/Map',
-        'esri/views/MapView'
+        'esri/views/MapView',
+        'esri/geometry/support/webMercatorUtils',
       ]);
 
       // Set type of map
@@ -91,15 +99,54 @@ export class EsriMapComponent implements OnInit {
       // Now execute additional processes
       mapView.when(() => {
         this.mapLoaded.emit(true);
+
       });
+
+      mapView.on('click', (event) => {
+        const clickCoordinates = {
+          lat: event.mapPoint.latitude,
+          lng: event.mapPoint.longitude,
+        };
+
+        const json = JSON.stringify(clickCoordinates);
+
+        console.log('mapView click' + json);
+
+        alert(json);
+
+        // this.snackBar.open(json, '', {
+        //   duration: 500,
+        //   // verticalPosition: 'top',
+        //   // horizontalPosition: 'end',
+        //   location: 'top'
+        // });
+      });
+
+      // https://community.esri.com/thread/213365-show-coordinates-wont-work-in-4x
+      mapView.on('pointer-move', (event) => {
+
+        const point = mapView.toMap({x: event.x, y: event.y});
+        // the map is in web mercator but display coordinates in geographic (lat, long)
+        const mp = webMercatorUtils.webMercatorToGeographic(point);
+
+        const json = JSON.stringify(mp);
+
+        console.log('mapView mouse move' + json);
+        // mapView.on("mouse-drag", showCoordinates);
+      });
+
+      // // when the map is clicked create a buffer around the click point of the specified distance.
+      // mapView.on("click", function(evt){
+      //   mapView.graphics.clear();
+      //   mapView.graphics.add(new Graphic(evt.mapPoint, symbol));
+      //   mapView.infoWindow.setContent("X: " + evt.mapPoint.x.toString() + ", <br>Y: " + evt.mapPoint.y.toString());
+      //   mapView.infoWindow.show(evt.mapPoint)
+      // });
+
     } catch (error) {
       alert('We have an error: ' + error);
     }
 
-  }
-
-  ngOnInit() {
-    this.initializeMap();
   }
 
 }
