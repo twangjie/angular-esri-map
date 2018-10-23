@@ -26,6 +26,8 @@ export class EsriMapComponent implements OnInit {
   @Output() mapLoaded = new EventEmitter<boolean>();
   @ViewChild('mapViewNode') private mapViewEl: ElementRef;
 
+  mousePoint = '';
+
   /**
    * @private _zoom sets map zoom
    * @private _center sets map center
@@ -131,7 +133,8 @@ export class EsriMapComponent implements OnInit {
 
         const json = JSON.stringify(mp);
 
-        console.log('mapView mouse move' + json);
+        // console.log('mapView mouse move' + json);
+        this.mousePoint = json;
         // mapView.on("mouse-drag", showCoordinates);
       });
 
